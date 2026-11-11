@@ -18,21 +18,32 @@ VERILOG_SOURCES += $(addprefix $(SRC_DIR)/,$(PROJECT_SOURCES))
 
 else ifeq ($(TIMING), yes)
 
-SIM = cvc
 SIM_BUILD				= sim_build/gl
+ifeq ($(SIM), cvc)
 COMPILE_ARGS    += +define+GL_TEST
 COMPILE_ARGS    += +define+USE_POWER_PINS
 COMPILE_ARGS    += +define+SIM
 COMPILE_ARGS    += +define+SDF_ANNOTATE
-COMPILE_ARGS    += +verbose
-COMPILE_ARGS    += +sdfverbose
+else
+COMPILE_ARGS    += -gspecify -ginterconnect
+COMPILE_ARGS    += -DGL_TEST
+COMPILE_ARGS    += -DUSE_POWER_PINS
+COMPILE_ARGS    += -DSIM
+COMPILE_ARGS    += -DSDF_ANNOTATE
+endif
+
 VERILOG_SOURCES += $(PDK_ROOT)/ciel/sky130/versions/8afc8346a57fe1ab7934ba5a6056ea8b43078e71/sky130A/libs.ref/sky130_fd_sc_hd/verilog/primitives.v
 VERILOG_SOURCES += $(PDK_ROOT)/ciel/sky130/versions/8afc8346a57fe1ab7934ba5a6056ea8b43078e71/sky130A/libs.ref/sky130_fd_sc_hd/verilog/sky130_fd_sc_hd.v
 
 # this gets copied in by the GDS action workflow
 VERILOG_SOURCES += $(PWD)/gate_level_netlist.v
 
+ifeq ($(HARDEN), yes)
 harden := $(shell (cd .. && ./tt/tt_tool.py --pdk $(PDK) --harden && cp $(CURDIR)/../runs/wokwi/final/pnl/tt_um_bbawj_volt_profile.pnl.v test/gate_level_netlist.v) 1>&2)
+ifneq ($(.SHELLSTATUS),0)
+$(error Hardening failed)
+endif
+endif
 
 else
 

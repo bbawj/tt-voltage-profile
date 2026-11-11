@@ -27,12 +27,14 @@ module tt_um_bbawj_volt_profile (
   wire [7:0] sensor_reading;
   ro_sensor ro_sensor_ (
       .en_i(ui_in[0]),
+      .rst_n_i(rst_n),
       .counter_o(sensor_reading)
   );
 
   reg [7:0] sensor_reading_sync;
-  always @(posedge clk) begin
-    sensor_reading_sync <= sensor_reading;
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) sensor_reading_sync <= 0;
+    else sensor_reading_sync <= sensor_reading;
   end
 
   assign uo_out = sensor_reading_sync;

@@ -12,10 +12,8 @@ module tb ();
     $sdf_annotate(
         "../runs/wokwi/final/sdf/nom_tt_025C_1v80/tt_um_bbawj_volt_profile__nom_tt_025C_1v80.sdf",
         user_project);
-    $dumpfile("tb.vcd");
-`else
-    $dumpfile("tb.fst");
 `endif
+    $dumpfile("tb.fst");
     $dumpvars(0, tb);
     #1;
   end
