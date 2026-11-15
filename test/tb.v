@@ -51,4 +51,38 @@ module tb ();
       .rst_n  (rst_n)     // not reset
   );
 
+`ifdef GL_TEST
+  // Test-only taps into one representative RO per waster array (gen_ro[0] of
+  // each), reached via Verilog's own hierarchical reference so cocotb only
+  // ever sees one plain, bracket-free bus. Its Python-side name discovery
+  // can't safely walk the flattened post-layout netlist's escaped
+  // identifiers directly (see test.py), so the splicing has to happen here,
+  // at elaboration time, instead. Verilog can't generate these from a
+  // `generate`/genvar loop: a genvar can't be spliced into the text of an
+  // escaped identifier, since that identifier is one opaque token to the
+  // flattened netlist, not a real indexable hierarchy.
+  wire waster_tap_0 = user_project.\wasters/g_array[0].arr/gen_ro[0].ro_/last ;
+  wire waster_tap_1 = user_project.\wasters/g_array[1].arr/gen_ro[0].ro_/last ;
+  wire waster_tap_2 = user_project.\wasters/g_array[2].arr/gen_ro[0].ro_/last ;
+  wire waster_tap_3 = user_project.\wasters/g_array[3].arr/gen_ro[0].ro_/last ;
+  wire waster_tap_4 = user_project.\wasters/g_array[4].arr/gen_ro[0].ro_/last ;
+  wire waster_tap_5 = user_project.\wasters/g_array[5].arr/gen_ro[0].ro_/last ;
+  wire waster_tap_6 = user_project.\wasters/g_array[6].arr/gen_ro[0].ro_/last ;
+  wire waster_tap_7 = user_project.\wasters/g_array[7].arr/gen_ro[0].ro_/last ;
+  wire waster_tap_8 = user_project.\wasters/g_array[8].arr/gen_ro[0].ro_/last ;
+  wire waster_tap_9 = user_project.\wasters/g_array[9].arr/gen_ro[0].ro_/last ;
+  wire waster_tap_10 = user_project.\wasters/g_array[10].arr/gen_ro[0].ro_/last ;
+  wire waster_tap_11 = user_project.\wasters/g_array[11].arr/gen_ro[0].ro_/last ;
+  wire waster_tap_12 = user_project.\wasters/g_array[12].arr/gen_ro[0].ro_/last ;
+  wire waster_tap_13 = user_project.\wasters/g_array[13].arr/gen_ro[0].ro_/last ;
+  wire waster_tap_14 = user_project.\wasters/g_array[14].arr/gen_ro[0].ro_/last ;
+  wire waster_tap_15 = user_project.\wasters/g_array[15].arr/gen_ro[0].ro_/last ;
+  wire [15:0] waster_tap = {
+    waster_tap_15, waster_tap_14, waster_tap_13, waster_tap_12,
+    waster_tap_11, waster_tap_10, waster_tap_9,  waster_tap_8,
+    waster_tap_7,  waster_tap_6,  waster_tap_5,  waster_tap_4,
+    waster_tap_3,  waster_tap_2,  waster_tap_1,  waster_tap_0
+  };
+`endif
+
 endmodule

@@ -8,7 +8,10 @@ TOPLEVEL_LANG ?= verilog
 SRC_DIR = $(PWD)/../src
 PROJECT_SOURCES = project.v
 PROJECT_SOURCES += ro_sensor.sv
+PROJECT_SOURCES += ro.sv
 PROJECT_SOURCES += inv.sv
+PROJECT_SOURCES += waster_array.sv
+PROJECT_SOURCES += waster_array_sel.sv
 
 ifneq ($(GATES),yes)
 
@@ -39,7 +42,7 @@ VERILOG_SOURCES += $(PDK_ROOT)/ciel/sky130/versions/8afc8346a57fe1ab7934ba5a6056
 VERILOG_SOURCES += $(PWD)/gate_level_netlist.v
 
 ifeq ($(HARDEN), yes)
-harden := $(shell (cd .. && ./tt/tt_tool.py --pdk $(PDK) --harden && cp $(CURDIR)/../runs/wokwi/final/pnl/tt_um_bbawj_volt_profile.pnl.v test/gate_level_netlist.v) 1>&2)
+harden := $(shell (cd .. && ./tt/tt_tool.py --create-user-config --pdk $(PDK) --harden && cp $(CURDIR)/../runs/wokwi/final/pnl/tt_um_bbawj_volt_profile.pnl.v test/gate_level_netlist.v) 1>&2)
 ifneq ($(.SHELLSTATUS),0)
 $(error Hardening failed)
 endif

@@ -22,13 +22,20 @@ module tt_um_bbawj_volt_profile (
   assign uio_oe  = 0;
 
   // List all unused inputs to prevent warnings
-  wire _unused = &{ena, rst_n, uio_in, ui_in[7:1], 1'b0};
+  wire _unused = &{ena, uio_in, ui_in[3:2], 1'b0};
 
   wire [7:0] sensor_reading;
   ro_sensor ro_sensor_ (
       .en_i(ui_in[0]),
       .rst_n_i(rst_n),
       .counter_o(sensor_reading)
+  );
+
+  (* keep = "true" *) waster_array_sel wasters (
+      .clk  (clk),
+      .rst_n(rst_n),
+      .en_i (ui_in[1]),
+      .sel_i(ui_in[7:4])
   );
 
   reg [7:0] sensor_reading_sync;

@@ -19,7 +19,11 @@ project:
   source_files:
     - "project.v"
     - "ro_sensor.sv"
+    - "ro.sv"
     - "inv.sv"
+    - "inv_en.sv"
+    - "waster_array.sv"
+    - "waster_array_sel.sv"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 # This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).
