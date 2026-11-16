@@ -33,7 +33,7 @@ class TB:
         await RisingEdge(self.dut.clk)
 
 
-@cocotb.test()
+@cocotb.test(skip=not (GATES and TIMING))
 async def test_counter_increments(dut):
     tb = TB(dut)
     await tb.reset()

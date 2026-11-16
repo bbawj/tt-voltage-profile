@@ -10,7 +10,7 @@ module tb ();
   initial begin
 `ifdef SDF_ANNOTATE
     $sdf_annotate(
-        "../runs/wokwi/final/sdf/nom_tt_025C_1v80/tt_um_bbawj_volt_profile__nom_tt_025C_1v80.sdf",
+        "../runs/wokwi/final/sdf/nom_tt_025C_3v30/tt_um_bbawj_volt_profile__nom_tt_025C_3v30.sdf",
         user_project);
 `endif
     $dumpfile("tb.fst");

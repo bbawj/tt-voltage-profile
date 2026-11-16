@@ -12,7 +12,7 @@ module waster_array (
     input wire en_i
 );
 
-  localparam integer NUM = 16;
+  localparam integer NUM = 32;
   genvar i;
   generate
     for (i = 0; i < NUM; i += 1) begin : gen_ro

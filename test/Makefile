@@ -21,6 +21,7 @@ VERILOG_SOURCES += $(addprefix $(SRC_DIR)/,$(PROJECT_SOURCES))
 
 else ifeq ($(TIMING), yes)
 
+# Gate level simulation with SDF timing annotation:
 SIM_BUILD				= sim_build/gl
 ifeq ($(SIM), cvc)
 COMPILE_ARGS    += +define+GL_TEST
@@ -34,15 +35,14 @@ COMPILE_ARGS    += -DUSE_POWER_PINS
 COMPILE_ARGS    += -DSIM
 COMPILE_ARGS    += -DSDF_ANNOTATE
 endif
-
-VERILOG_SOURCES += $(PDK_ROOT)/ciel/sky130/versions/8afc8346a57fe1ab7934ba5a6056ea8b43078e71/sky130A/libs.ref/sky130_fd_sc_hd/verilog/primitives.v
-VERILOG_SOURCES += $(PDK_ROOT)/ciel/sky130/versions/8afc8346a57fe1ab7934ba5a6056ea8b43078e71/sky130A/libs.ref/sky130_fd_sc_hd/verilog/sky130_fd_sc_hd.v
+VERILOG_SOURCES += $(PDK_ROOT)/ciel/gf180mcu/versions/54435919abffb937387ec956209f9cf5fd2dfbee/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu7t5v0/verilog/primitives.v
+VERILOG_SOURCES += $(PDK_ROOT)/ciel/gf180mcu/versions/54435919abffb937387ec956209f9cf5fd2dfbee/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu7t5v0/verilog/gf180mcu_fd_sc_mcu7t5v0.v
 
 # this gets copied in by the GDS action workflow
 VERILOG_SOURCES += $(PWD)/gate_level_netlist.v
 
 ifeq ($(HARDEN), yes)
-harden := $(shell (cd .. && ./tt/tt_tool.py --create-user-config --pdk $(PDK) --harden && cp $(CURDIR)/../runs/wokwi/final/pnl/tt_um_bbawj_volt_profile.pnl.v test/gate_level_netlist.v) 1>&2)
+harden := $(shell (cd .. && ./tt/tt_tool.py --create-user-config --pdk $(PDK) --harden && cp $(CURDIR)/../runs/wokwi/final/pnl/tt_um_bbawj_volt_profile.pnl.v $(CURDIR)/gate_level_netlist.v) 1>&2)
 ifneq ($(.SHELLSTATUS),0)
 $(error Hardening failed)
 endif
@@ -57,8 +57,8 @@ COMPILE_ARGS    += -DFUNCTIONAL
 COMPILE_ARGS    += -DUSE_POWER_PINS
 COMPILE_ARGS    += -DSIM
 COMPILE_ARGS    += -DUNIT_DELAY=\#1
-VERILOG_SOURCES += $(PDK_ROOT)/ciel/sky130/versions/8afc8346a57fe1ab7934ba5a6056ea8b43078e71/sky130A/libs.ref/sky130_fd_sc_hd/verilog/primitives.v
-VERILOG_SOURCES += $(PDK_ROOT)/ciel/sky130/versions/8afc8346a57fe1ab7934ba5a6056ea8b43078e71/sky130A/libs.ref/sky130_fd_sc_hd/verilog/sky130_fd_sc_hd.v
+VERILOG_SOURCES += $(PDK_ROOT)/ciel/gf180mcu/versions/54435919abffb937387ec956209f9cf5fd2dfbee/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu7t5v0/verilog/primitives.v
+VERILOG_SOURCES += $(PDK_ROOT)/ciel/gf180mcu/versions/54435919abffb937387ec956209f9cf5fd2dfbee/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu7t5v0/verilog/gf180mcu_fd_sc_mcu7t5v0.v
 
 # this gets copied in by the GDS action workflow
 VERILOG_SOURCES += $(PWD)/gate_level_netlist.v
@@ -66,11 +66,7 @@ VERILOG_SOURCES += $(PWD)/gate_level_netlist.v
 endif
 
 # Allow sharing configuration between design and testbench via `include`:
-ifeq ($(SIM),cvc) 
-COMPILE_ARGS 		+= +incdir+$(SRC_DIR)
-else
 COMPILE_ARGS 		+= -I$(SRC_DIR)
-endif
 
 # Include the testbench sources:
 VERILOG_SOURCES += $(PWD)/tb.v
