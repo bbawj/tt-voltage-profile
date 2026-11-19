@@ -17,7 +17,7 @@ module tt_um_bbawj_volt_profile (
 );
 
   // All output pins must be assigned. If not used, assign to 0.
-  assign uio_oe  = 8'b11111111;
+  assign uio_oe = 8'b11111111;
 
   // List all unused inputs to prevent warnings
   wire _unused = &{ena, uio_in, 1'b0};
@@ -35,11 +35,11 @@ module tt_um_bbawj_volt_profile (
       .counter_o(sensor_reading)
   );
 
-  tdc tdc_(
-    .clk(clk),
-    .en_i(tdc_en_sel ? tdc_en : waster_en),
-    .done(),
-    .hamming_weight(uio_out)
+  tdc tdc_ (
+      .clk(clk),
+      .en_i(tdc_en_sel ? tdc_en : waster_en),
+      .done(),
+      .hamming_weight(uio_out)
   );
 
   (* keep = "true" *) waster_array_sel wasters_1 (
