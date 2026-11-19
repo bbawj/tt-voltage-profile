@@ -5,16 +5,20 @@ import os
 
 import cocotb
 from cocotb.clock import Clock, Timer
-from cocotb.triggers import RisingEdge, ClockCycles, ValueChange, ReadOnly
+from cocotb.triggers import RisingEdge, ClockCycles
 
 GATES = os.environ.get("GATES") == "yes"
 TIMING = os.environ.get("TIMING") == "yes"
+
+TDC_EN = 1 << 1
+TDC_EN_SEL = 1 << 2
+WASTER_EN = 1 << 3
 
 
 class TB:
     def __init__(self, dut):
         self.dut = dut
-        clock = Clock(dut.clk, 10, unit="ns")
+        clock = Clock(dut.clk, 25, unit="ns")
         cocotb.start_soon(clock.start())
 
     async def reset(self):
@@ -65,12 +69,11 @@ async def test_waster_oscillates(dut):
     tb = TB(dut)
     await tb.reset()
 
-    enable_wasters = 1 << 1
-    dut.ui_in.value = enable_wasters
+    dut.ui_in.value = WASTER_EN
 
     for sel in range(16):
         await RisingEdge(dut.clk)
-        dut.ui_in.value = enable_wasters | (sel << 4)
+        dut.ui_in.value = WASTER_EN | (sel << 4)
         await RisingEdge(dut.clk)
         # 1 additional clock cycle latency from synchronous enable
         await RisingEdge(dut.clk)
@@ -78,3 +81,26 @@ async def test_waster_oscillates(dut):
         assert mask == ((1 << (sel + 1)) - 1), (
             f"sel_i={sel}: expected only bit {sel} to toggle, got mask {mask:#06x}"
         )
+
+
+@cocotb.test(skip=not (GATES and TIMING))
+async def test_tdc_counter(dut):
+    tb = TB(dut)
+    await tb.reset()
+
+    assert dut.uio_oe.value != 0, "sanity check failed, the design should output uio"
+
+    dut.ui_in.value = WASTER_EN
+    await ClockCycles(dut.clk, 32)
+    assert dut.uio_out.value.to_unsigned() > 0, "waster_en should trigger TDC"
+
+    dut.ui_in.value = 0
+    await RisingEdge(dut.clk)
+    await RisingEdge(dut.clk)
+    await RisingEdge(dut.clk)
+    assert dut.uio_out.value != 0, "Input reset to 0 should not affect TDC count"
+
+    dut.ui_in.value = TDC_EN | TDC_EN_SEL
+    await ClockCycles(dut.clk, 32)
+    assert dut.uio_out.value.to_unsigned(
+    ) > 0, "TDC sel should have triggered another count"

@@ -17,25 +17,43 @@ module tt_um_bbawj_volt_profile (
 );
 
   // All output pins must be assigned. If not used, assign to 0.
-  // assign uo_out  = ui_in + uio_in;  // Example: ou_out is the sum of ui_in and uio_in
-  assign uio_out = 0;
-  assign uio_oe  = 0;
+  assign uio_oe  = 8'b11111111;
 
   // List all unused inputs to prevent warnings
-  wire _unused = &{ena, uio_in, ui_in[3:2], 1'b0};
+  wire _unused = &{ena, uio_in, 1'b0};
+
+  wire ro_sensor_en, waster_en, tdc_en_sel, tdc_en;
+  assign ro_sensor_en = ui_in[0];
+  assign tdc_en = ui_in[1];
+  assign tdc_en_sel = ui_in[2];
+  assign waster_en = ui_in[3];
 
   wire [7:0] sensor_reading;
   ro_sensor ro_sensor_ (
-      .en_i(ui_in[0]),
+      .en_i(ro_sensor_en),
       .rst_n_i(rst_n),
       .counter_o(sensor_reading)
   );
 
-  (* keep = "true" *) waster_array_sel wasters (
+  tdc tdc_(
+    .clk(clk),
+    .en_i(tdc_en_sel ? tdc_en : waster_en),
+    .done(),
+    .hamming_weight(uio_out)
+  );
+
+  (* keep = "true" *) waster_array_sel wasters_1 (
       .clk  (clk),
       .rst_n(rst_n),
-      .en_i (ui_in[1]),
-      .sel_i(ui_in[7:4])
+      .en_i (waster_en),
+      .sel_i(ui_in[7] ? 3'b111 : ui_in[6:4])
+  );
+
+  (* keep = "true" *) waster_array_sel wasters_2 (
+      .clk  (clk),
+      .rst_n(rst_n),
+      .en_i (ui_in[7] & waster_en),
+      .sel_i(ui_in[6:4])
   );
 
   reg [7:0] sensor_reading_sync;

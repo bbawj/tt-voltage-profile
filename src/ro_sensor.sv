@@ -14,7 +14,7 @@ module ro_sensor #(
     input wire en_i,
     input wire rst_n_i,
     // how many bit counter?
-    output wire [COUNTER_SIZE-1:0] counter_o
+    output reg [COUNTER_SIZE-1:0] counter_o
 );
 
   wire [STAGES-1:0] out_N;
@@ -35,12 +35,9 @@ module ro_sensor #(
   endgenerate
 
 
-  reg [COUNTER_SIZE-1:0] counter;
   always @(posedge out_N[STAGES-1] or negedge rst_n_i) begin
-    if (!rst_n_i) counter <= 0;
-    else counter <= counter + 1;
+    if (!rst_n_i) counter_o <= 0;
+    else counter_o <= counter_o + 1;
   end
-
-  assign counter_o = rst_n_i ? counter : 0;
 
 endmodule

@@ -23,15 +23,18 @@ project:
     - "inv.sv"
     - "waster_array.sv"
     - "waster_array_sel.sv"
+    - "pulse_gen.sv"
+    - "carry_chain.sv"
+    - "tdc.sv"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 # This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).
 pinout:
   # Inputs
-  ui[0]: "SENSOR_EN"
-  ui[1]: "WASTER_EN"
-  ui[2]: ""
-  ui[3]: ""
+  ui[0]: "RO_SENSOR_EN"
+  ui[1]: "TDC_EN"
+  ui[2]: "TDC_EN_SEL"
+  ui[3]: "WASTER_EN"
   ui[4]: "WASTER_SEL0"
   ui[5]: "WASTER_SEL1"
   ui[6]: "WASTER_SEL2"
@@ -48,14 +51,14 @@ pinout:
   uo[7]: "RO_COUNT7"
 
   # Bidirectional pins
-  uio[0]: ""
-  uio[1]: ""
-  uio[2]: ""
-  uio[3]: ""
-  uio[4]: ""
-  uio[5]: ""
-  uio[6]: ""
-  uio[7]: ""
+  uio[0]: "TDC_COUNT0"
+  uio[1]: "TDC_COUNT1"
+  uio[2]: "TDC_COUNT2"
+  uio[3]: "TDC_COUNT3"
+  uio[4]: "TDC_COUNT4"
+  uio[5]: "TDC_COUNT5"
+  uio[6]: "TDC_COUNT6"
+  uio[7]: "TDC_COUNT7"
 
 # Do not change!
 yaml_version: 6

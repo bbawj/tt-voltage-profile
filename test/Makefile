@@ -48,6 +48,16 @@ $(error Hardening failed)
 endif
 endif
 
+# Icarus can't match the COND-qualified IOPATH entries the generated SDF
+# uses for the carry chain's addf_1 cells, so it leaves their CI->CO delay
+# at 0ns (see gen_addf_override_sdf.py). Regenerate the override file from
+# the current harden run's SDF every time, since runs/wokwi/final/ is
+# overwritten by each --harden.
+gen_addf_override := $(shell python3 $(CURDIR)/gen_addf_override_sdf.py 1>&2)
+ifneq ($(.SHELLSTATUS),0)
+$(error Failed to generate addf_override.sdf)
+endif
+
 else
 
 # Gate level simulation:
