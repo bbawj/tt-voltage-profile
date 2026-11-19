@@ -14,11 +14,12 @@ module tdc #(
 ) (
     input wire clk,
     input wire en_i,
+    input wire delay_en_i,
     output reg done,
-    output reg [7:0] hamming_weight
+    output reg [5:0] hamming_weight
 );
 
-  localparam integer N = 31;
+  localparam integer N = 50;
   localparam integer CW = $clog2(N + 1);
 
   wire pulse;
@@ -28,12 +29,21 @@ module tdc #(
       .q  (pulse)
   );
 
+  // delay the rising edge before entering the carry chain. In case the
+  // hamming weight is a large value, this brings it closer to the middle
+  wire carry_chain_rising_edge;
+  delay delay (
+      .bypass_i(delay_en_i),
+      .in(en_i),
+      .out(carry_chain_rising_edge)
+  );
+
   wire [N-1:0] taps;
   reg  [N-1:0] taps_sync;
   carry_chain #(
-      .N(N)
+      .N(MAXCHAIN)
   ) cc (
-      .edge_i(en_i),
+      .edge_i(carry_chain_rising_edge),
       .taps  (taps)
   );
 

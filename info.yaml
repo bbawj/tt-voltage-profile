@@ -25,6 +25,7 @@ project:
     - "waster_array_sel.sv"
     - "pulse_gen.sv"
     - "carry_chain.sv"
+    - "delay.sv"
     - "tdc.sv"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.

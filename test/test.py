@@ -104,3 +104,37 @@ async def test_tdc_counter(dut):
     await ClockCycles(dut.clk, 32)
     assert dut.uio_out.value.to_unsigned(
     ) > 0, "TDC sel should have triggered another count"
+
+
+@cocotb.test(skip=not (GATES and TIMING))
+async def test_tdc_delay_element(dut):
+    """delay_en_i (uio_in[7]) routes the carry chain's rising edge through an
+    extra dlyb_2 delay buffer (src/delay.sv), so it starts propagating down
+    the chain later. Sampled one clock period later, a later-starting edge
+    has reached fewer taps, so the hamming weight should be lower with the
+    delay element enabled. Only meaningful with real gate delays (GL +
+    SDF timing), same as test_waster_oscillates.
+    """
+    tb = TB(dut)
+    await tb.reset()
+
+    async def run_tdc(delay_en):
+        dut.uio_in.value = (1 << 7) if delay_en else 0
+        dut.ui_in.value = 0
+        await RisingEdge(dut.clk)
+        dut.ui_in.value = TDC_EN | TDC_EN_SEL
+        # N=63 taps to shift out serially, plus margin for the TDC to settle.
+        await ClockCycles(dut.clk, 70)
+        weight = dut.uio_out.value.to_unsigned() & 0x3F
+        dut.ui_in.value = 0
+        await ClockCycles(dut.clk, 2)
+        return weight
+
+    weight_no_delay = await run_tdc(delay_en=False)
+    weight_with_delay = await run_tdc(delay_en=True)
+
+    assert 0 < weight_with_delay < weight_no_delay < 63, (
+        f"enabling delay_en_i should shift the edge later and reduce the "
+        f"hamming weight sampled next cycle: no-delay={weight_no_delay}, "
+        f"with-delay={weight_with_delay}"
+    )
